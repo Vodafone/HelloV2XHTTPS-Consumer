@@ -1,0 +1,10 @@
+src/main/java/v2x/consumer/api/ApiUtil.java
+src/main/java/v2x/consumer/api/V2xApi.java
+src/main/java/v2x/consumer/api/V2xApiController.java
+src/main/java/v2x/consumer/api/V2xApiDelegate.java
+src/main/java/v2x/consumer/model/Error.java
+src/main/java/v2x/consumer/model/GeoAddress.java
+src/main/java/v2x/consumer/model/GeoCoding.java
+src/main/java/v2x/consumer/model/Message.java
+src/main/java/v2x/consumer/model/MessageBuffer.java
+src/main/java/v2x/consumer/model/StreamData.java

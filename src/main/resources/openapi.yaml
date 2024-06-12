@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: xxx@vodafone.com
+  description: V2X Consumer API draft proposal
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: V2X Consumer API (draft)
+  version: 1.0.0
+externalDocs:
+  description: Vodafone Confluence documentation
+  url: https://confluence.tools.aws.vodafone.com/pages/viewpage.action?spaceKey=SSTFEP&title=STEP+-+Safer+Transport+for+Europe+Platform+Home
+servers:
+  - url: '{protocol}://{hostserver}.{environment}:{port}/{version}'
+    variables:
+      protocol:
+        default: https
+        enum:
+        - http
+        - https
+      hostserver:
+        default: servername1
+        enum:
+        - servername1
+        - servername2
+      environment:
+        default: pro
+        enum:
+        - dev
+        - pre
+        - pro
+      port:
+        default: "443"
+        enum:
+        - "443"
+        - "8443"
+      version:
+        default: v1
+        enum:
+        - v1
+        - v2
+security:
+- bearerAuth: []
+tags:
+- description: Related with V2X message streaming
+  name: V2X
+paths:
+  /v2x:
+    post:
+      description: Processes a batch of Kafka Messages
+      operationId: consumerV2x
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageBuffer'
+        description: Object containing the encoded message as well as some decoded
+          elements
+        required: true
+      responses:
+        "200":
+          description: message was received
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The received message was not in a correct format
+      summary: PoC Service for receiving Kafka Streaming messages
+      tags:
+      - V2X
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: V2X
+components:
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: The received message was not in a correct format
+  schemas:
+    MessageBuffer:
+      example:
+        subService: DENM
+        stream:
+          partition: 1
+          messageCount: 10
+          offset: 123456789
+        service: v2x
+        buffer:
+        - geocoding:
+            subtopics: s/p/u/b/m/s/j/f
+            type: g8
+          geoaddress:
+            lon: 43.6640935
+            lat: 43.6640935
+          payload: json representation of the v2x message
+          timestamp: "1632838789"
+        - geocoding:
+            subtopics: s/p/u/b/m/s/j/f
+            type: g8
+          geoaddress:
+            lon: 43.6640935
+            lat: 43.6640935
+          payload: json representation of the v2x message
+          timestamp: "1632838789"
+        version: "1"
+        subServiceGroup: public
+      properties:
+        service:
+          example: v2x
+          type: string
+        subService:
+          enum:
+          - DENM
+          - IVIM
+          example: DENM
+          type: string
+        subServiceGroup:
+          example: public
+          type: string
+        buffer:
+          items:
+            $ref: '#/components/schemas/Message'
+          type: array
+        stream:
+          $ref: '#/components/schemas/StreamData'
+        version:
+          example: "1"
+          type: string
+      required:
+      - messages
+      - service
+      - subService
+      - subServiceGroup
+      type: object
+    Message:
+      example:
+        geocoding:
+          subtopics: s/p/u/b/m/s/j/f
+          type: g8
+        geoaddress:
+          lon: 43.6640935
+          lat: 43.6640935
+        payload: json representation of the v2x message
+        timestamp: "1632838789"
+      properties:
+        geocoding:
+          $ref: '#/components/schemas/GeoCoding'
+        geoaddress:
+          $ref: '#/components/schemas/GeoAddress'
+        timestamp:
+          example: "1632838789"
+          type: string
+        payload:
+          example: json representation of the v2x message
+          type: string
+      type: object
+    StreamData:
+      example:
+        partition: 1
+        messageCount: 10
+        offset: 123456789
+      properties:
+        partition:
+          example: 1
+          type: number
+        offset:
+          example: 123456789
+          type: number
+        messageCount:
+          example: 10
+          type: number
+      type: object
+    GeoAddress:
+      example:
+        lon: 43.6640935
+        lat: 43.6640935
+      properties:
+        lat:
+          example: 43.6640935
+          format: double
+          maximum: 90.0
+          minimum: -90.0
+          type: number
+        lon:
+          example: 43.6640935
+          format: double
+          maximum: 90.0
+          minimum: -90.0
+          type: number
+      type: object
+    GeoCoding:
+      example:
+        subtopics: s/p/u/b/m/s/j/f
+        type: g8
+      properties:
+        type:
+          example: g8
+          maxLength: 2
+          minLength: 2
+          pattern: "^[g]\\d{1}$"
+          type: string
+        subtopics:
+          example: s/p/u/b/m/s/j/f
+          pattern: "^[a-z]$|(?:^[a-z])(?:[/][a-z]){1,7}"
+          type: string
+      type: object
+    Error:
+      properties:
+        code:
+          example: "987"
+          type: string
+        message:
+          example: custom error message
+          type: string
+      required:
+      - code
+      - message
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

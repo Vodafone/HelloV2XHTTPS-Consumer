@@ -1,0 +1,12 @@
+server:
+  port: 8080
+  servlet:
+    contextPath: /
+springfox:
+  documentation:
+    open-api:
+      v3:
+        path: /api-docs
+springdoc:
+   swagger-ui:
+     url: /openapi.yaml
